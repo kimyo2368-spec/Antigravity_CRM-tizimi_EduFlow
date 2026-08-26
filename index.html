@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EduFlow CRM v1.8.0 — O'quv markazlarini raqamlashtirish, o'quvchilar, moliya, davomat va AI boshqaruv tizimi.">
+  <meta name="robots" content="index, follow">
+
+  <!-- FIX #26: No unsafe-inline for scripts, only for styles (needed for inline style attrs) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com; script-src 'self'; img-src 'self' data:;">
+
+  <!-- FIX #28: Version unified to v1.8.0 -->
+  <title>EduFlow CRM v1.8.0 — O'quv Markaz Boshqaruv Tizimi</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
+
+  <!-- FIX #34: Font imported only here, removed from CSS -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+  <noscript>
+    <div style="background:#ef4444; color:#fff; text-align:center; padding:16px; font-weight:bold; position:fixed; top:0; left:0; right:0; z-index:99999;">
+      ⚠️ EduFlow CRM tizimidan foydalanish uchun brauzeringizda JavaScript-ni yoqing!
+    </div>
+  </noscript>
+
+  <div id="app">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" role="navigation" aria-label="Asosiy menyu">
+      <div class="brand-logo">
+        <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+        <h1 id="header-logo-title">EduFlow CRM</h1>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <button id="nav-dashboard" class="active" aria-label="Boshqaruv Paneli">
+            <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
+            <span>Boshqaruv Paneli</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-students" aria-label="O'quvchilar">
+            <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
+            <span>O'quvchilar</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-groups" aria-label="Guruhlar">
+            <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+            <span>Guruhlar</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-teachers" aria-label="O'qituvchilar">
+            <i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i>
+            <span>O'qituvchilar</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-admins" aria-label="Adminlar & Xodimlar">
+            <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+            <span>Adminlar & Xodimlar</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-branches" aria-label="Filiallar">
+            <i class="fa-solid fa-code-branch" aria-hidden="true"></i>
+            <span>Filiallar</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-attendance" aria-label="Davomat">
+            <i class="fa-solid fa-clipboard-user" aria-hidden="true"></i>
+            <span>O'quvchilar Davomati</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-employeeAttendance" aria-label="Xodimlar Davomati">
+            <i class="fa-solid fa-user-clock" aria-hidden="true"></i>
+            <span>Xodimlar Davomati</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-payments" aria-label="To'lovlar">
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>To'lovlar</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-leads" aria-label="Lidlar Kanban">
+            <i class="fa-solid fa-filter-circle-dollar" aria-hidden="true"></i>
+            <span>Lidlar (Kanban)</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-homework" aria-label="Uy Vazifalari">
+            <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+            <span>Uy Vazifalari</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-certificates" aria-label="Sertifikatlar">
+            <i class="fa-solid fa-award" aria-hidden="true"></i>
+            <span>Sertifikatlar</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-telegramBot" aria-label="Telegram Bot va SMS">
+            <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+            <span>Telegram Bot &amp; SMS</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-finance" aria-label="Moliyaviy P&amp;L">
+            <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+            <span>Moliyaviy P&amp;L</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-calendar" aria-label="Dars Jadvallari">
+            <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+            <span>Dars Jadvallari</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-reports" aria-label="Hisobotlar va Eksport">
+            <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
+            <span>Hisobotlar &amp; Eksport</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="nav-monitoring" aria-label="Tizim Monitoringi">
+            <i class="fa-solid fa-heart-pulse" aria-hidden="true"></i>
+            <span>Tizim Monitoringi</span>
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <button id="nav-settings" aria-label="Sozlamalar">
+            <i class="fa-solid fa-gears" aria-hidden="true"></i>
+            <span>Sozlamalar</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-widget" id="user-profile-widget">
+          <div class="user-avatar" id="user-avatar-initials">A</div>
+          <div class="user-info">
+            <strong id="user-display-name">Mehmon</strong>
+            <small id="user-display-role">Kirilmagan</small>
+          </div>
+          <button class="btn-icon" id="btn-logout" title="Tizimdan chiqish" aria-label="Tizimdan chiqish">
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper" style="flex:1; display:flex; flex-direction:column;">
+      <header class="top-header">
+        <!-- FIX #30: Hamburger menu for mobile -->
+        <button class="btn-icon hamburger-btn" id="hamburger-btn" title="Menyu" aria-label="Menyuni ochish">
+          <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+
+        <div class="header-branch-selector">
+          <i class="fa-solid fa-building-user text-primary" aria-hidden="true"></i>
+          <label for="global-branch-selector" class="sr-only">Filial tanlash</label>
+          <select id="global-branch-selector" aria-label="Filialni tanlash">
+            <option value="all">Barcha Filiallar (Umumiy)</option>
+            <option value="br-1">Chilonzor Filiali</option>
+            <option value="br-2">Yunusobod Filiali</option>
+            <option value="br-3">Samarqand Filiali</option>
+            <option value="br-4">Buxoro Filiali</option>
+          </select>
+        </div>
+
+        <div class="header-user-actions">
+          <div class="lang-selector">
+            <i class="fa-solid fa-globe" aria-hidden="true"></i>
+            <label for="lang-select" class="sr-only">Til</label>
+            <select id="lang-select" class="form-select-sm" aria-label="Tizim tilini tanlash">
+              <option value="uz">O'zbekcha</option>
+            </select>
+          </div>
+
+          <div class="offline-badge online" id="sync-status-badge">
+            <i class="fa-solid fa-wifi" aria-hidden="true"></i>
+            <span id="sync-status-text">Online</span>
+          </div>
+
+          <button class="btn-icon" id="theme-toggle-btn" title="Mavzuni o'zgartirish" aria-label="Mavzuni o'zgartirish">
+            <i class="fa-solid fa-moon" aria-hidden="true"></i>
+          </button>
+        </div>
+      </header>
+
+      <main class="content-container" id="module-content" style="padding: 32px; flex:1;" role="main">
+      </main>
+    </div>
+  </div>
+
+  <!-- Secure Login Modal Overlay -->
+  <div class="modal-overlay" id="login-overlay" style="display: flex;" role="dialog" aria-modal="true" aria-labelledby="login-title">
+    <div class="modal-content glass-card" style="max-width: 440px; padding: 36px;">
+      <div class="text-center mb-4">
+        <i class="fa-solid fa-graduation-cap text-primary" style="font-size: 48px; margin-bottom: 12px;" aria-hidden="true"></i>
+        <h2 id="login-title">EduFlow CRM</h2>
+        <p class="text-muted">Xavfsiz Boshqaruv Tizimiga Kirish</p>
+      </div>
+
+      <div id="login-error-alert" style="display:none; background:rgba(239,68,68,0.15); border:1px solid var(--color-danger); color:var(--color-danger); padding:10px 14px; border-radius:10px; font-size:13px; font-weight:600; margin-bottom:16px;"></div>
+
+      <form id="form-login" autocomplete="on">
+        <div class="form-group">
+          <label for="login-email">Email Manzili</label>
+          <!-- FIX #5: No password in placeholder -->
+          <input type="email" id="login-email" class="form-input" required autocomplete="username" placeholder="email@eduflow.uz">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Parol</label>
+          <!-- FIX #5: No password hint -->
+          <div style="position: relative;">
+            <input type="password" id="login-password" class="form-input" required autocomplete="current-password" placeholder="Parolingizni kiriting" style="padding-right: 40px;">
+            <i class="fa-solid fa-eye-slash" id="toggle-login-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 16px;"></i>
+          </div>
+        </div>
+
+        <!-- FIX #4: Remember me actually works now -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; font-size:13px;">
+          <label class="checkbox-label" style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="checkbox" id="login-remember">
+            <span>Eslab qolish</span>
+          </label>
+        </div>
+
+
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+          <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Tizimga Kirish
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Standalone Security Bundle -->
+  <script src="bundle.js"></script>
+  
+  <!-- Supabase Sync Engine -->
+  <script type="module" src="supabase_sync.js"></script>
+
+</body>
+</html>
