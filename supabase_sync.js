@@ -38,6 +38,7 @@ async function fetchAllFromSupabase() {
     const localDbStr = localStorage.getItem('eduflow_crm_db');
     if (localDbStr) {
       const localDb = JSON.parse(localDbStr);
+      lastDbState = JSON.parse(JSON.stringify(freshDb)); // FIX: Set this so pushToSupabase works
       await pushToSupabase(localDb);
       notify('Baza muvaffaqiyatli shakllantirildi!', 'success');
       return fetchAllFromSupabase(); // fetch again
@@ -72,7 +73,10 @@ async function pushToSupabase(newDb) {
     
     if (toUpsert.length > 0) {
       const { error } = await client.from(table).upsert(toUpsert);
-      if (error) console.error(`Error upserting to ${table}:`, error);
+      if (error) {
+        console.error(`Error upserting to ${table}:`, error);
+        notify(`Xatolik (${table}): ${error.message}`, 'error');
+      }
     }
     
     // Find Deletes
