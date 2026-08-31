@@ -60,7 +60,7 @@ async function fetchAllFromFirebase() {
     window.dispatchEvent(new CustomEvent('eduflow_supabase_sync', { detail: freshDb }));
     notify('Server bilan sinxronizatsiya muvaffaqiyatli yakunlandi!', 'success');
   } catch (error) {
-    console.error("Firebase fetch error:", error);
+    console.error("Firebase fetch error:", error); alert("Firebase fetch error: " + error.message);
     notify(`Tarmoq xatosi: ${error.message}`, 'error');
   }
 }
@@ -96,7 +96,7 @@ async function pushToFirebase(newDb) {
     
     lastDbState = JSON.parse(JSON.stringify(newDb));
   } catch (error) {
-    console.error("Firebase push error:", error);
+    console.error("Firebase push error:", error); alert("Firebase push error: " + error.message);
     notify(`Xatolik: ${error.message}`, 'error');
   }
 }
