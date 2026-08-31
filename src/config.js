@@ -1,4 +1,10 @@
 // Supabase Configuration
 // Iltimos, bu yerga o'zingizning Supabase loyiha sozlamalaringizni kiriting
-export const SUPABASE_URL = 'https://zctbaqrbvxwbklwlanzj.supabase.co'; // Sizning URL
-export const SUPABASE_ANON_KEY = 'sb_publishable_tcaiu_pbIloqnnBZm4JHAg_nKg5Lx-5';
+export const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDmKNvBDeaRhC5zOjlnbfR4PswayNw84ZI",
+  authDomain: "o-quv-markaz-eduflow.firebaseapp.com",
+  projectId: "o-quv-markaz-eduflow",
+  storageBucket: "o-quv-markaz-eduflow.firebasestorage.app",
+  messagingSenderId: "1059377068948",
+  appId: "1:1059377068948:web:4235b8dbc9ce38d6a02d81"
+};
