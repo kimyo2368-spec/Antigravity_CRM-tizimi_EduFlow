@@ -266,10 +266,10 @@
       { id: 'u-4', code: 'US-000004', fullName: 'Bobur Karimov', email: 'teacher2@eduflow.uz', passwordHash: DEFAULT_PASS_HASH, role: 'teacher', branchId: 'br-2', phone: '+998 93 456-78-90', subject: 'Python Backend' }
     ],
     students: [
-      { id: 'st-1', code: 'ST-000001', fullName: 'Sardorbek Rahimov', phone: '+998 97 111-22-33', parentName: 'Otabek Rahimov', parentPhone: '+998 90 999-88-77', branchId: 'br-1', groupId: 'gr-1', status: 'active', balance: 500000, joinedDate: '2026-05-10' },
-      { id: 'st-2', code: 'ST-000002', fullName: 'Zuhra Aliyeva', phone: '+998 93 222-33-44', parentName: 'Dilfuza Aliyeva', parentPhone: '+998 91 888-77-66', branchId: 'br-1', groupId: 'gr-1', status: 'active', balance: 0, joinedDate: '2026-06-01' },
-      { id: 'st-3', code: 'ST-000003', fullName: 'Nodirxon Jalolov', phone: '+998 90 333-44-55', parentName: 'Jaloliddinov N.', parentPhone: '+998 93 777-66-55', branchId: 'br-2', groupId: 'gr-2', status: 'active', balance: -250000, joinedDate: '2026-06-15' },
-      { id: 'st-4', code: 'ST-000004', fullName: 'Jasur Umarov', phone: '+998 94 444-55-66', parentName: 'Umarov S.', parentPhone: '+998 90 666-55-44', branchId: 'br-3', groupId: 'gr-3', status: 'frozen', balance: -450000, joinedDate: '2026-04-12' }
+      { id: 'st-1', code: 'ST-000001', fullName: 'Sardorbek Rahimov', phone: '+998 97 111-22-33', parentName: 'Otabek Rahimov', parentPhone: '+998 90 999-88-77', branchId: 'br-1', groupIds: ['gr-1'], status: 'active', balance: 500000, joinedDate: '2026-05-10' },
+      { id: 'st-2', code: 'ST-000002', fullName: 'Zuhra Aliyeva', phone: '+998 93 222-33-44', parentName: 'Dilfuza Aliyeva', parentPhone: '+998 91 888-77-66', branchId: 'br-1', groupIds: ['gr-1'], status: 'active', balance: 0, joinedDate: '2026-06-01' },
+      { id: 'st-3', code: 'ST-000003', fullName: 'Nodirxon Jalolov', phone: '+998 90 333-44-55', parentName: 'Jaloliddinov N.', parentPhone: '+998 93 777-66-55', branchId: 'br-2', groupIds: ['gr-2'], status: 'active', balance: -250000, joinedDate: '2026-06-15' },
+      { id: 'st-4', code: 'ST-000004', fullName: 'Jasur Umarov', phone: '+998 94 444-55-66', parentName: 'Umarov S.', parentPhone: '+998 90 666-55-44', branchId: 'br-3', groupIds: ['gr-3'], status: 'frozen', balance: -450000, joinedDate: '2026-04-12' }
     ],
     groups: [
       { id: 'gr-1', code: 'GR-000001', name: 'IELTS Intensive 7.5', courseName: 'Ingliz tili (IELTS)', teacherId: 'u-3', teacherName: 'Malika Sobirova', branchId: 'br-1', scheduleDays: 'Dush-Chor-Jum', scheduleTime: '14:00 - 16:00', room: 'Xona 102', monthlyFee: 600000, capacity: 15 },
@@ -673,7 +673,7 @@
       }
 
       tGroups.forEach(function(g) {
-        var groupStudentsCount = db.get('students', function(s) { return s.groupId === g.id && s.status === 'active'; }).length;
+        var groupStudentsCount = db.get('students', function(s) { return s.groupIds && s.groupIds.includes(g.id) && s.status === 'active'; }).length;
         tStudentsCount += groupStudentsCount;
         if (sType === 'percent') {
           estSalary += groupStudentsCount * Number(g.monthlyFee || 600000) * (sVal / 100);
@@ -837,8 +837,8 @@
     var courseDemand = {};
     allStudents.forEach(function(s) {
       if (s.status !== 'active') return;
-      var grp = allGroups.find(function(g) { return g.id === s.groupId; });
-      if (grp) { courseDemand[grp.courseName] = (courseDemand[grp.courseName] || 0) + 1; }
+      var stGroups = allGroups.filter(function(g) { return s.groupIds && s.groupIds.includes(g.id); });
+      stGroups.forEach(function(grp) { courseDemand[grp.courseName] = (courseDemand[grp.courseName] || 0) + 1; });
     });
     var topCourseName = 'Kurs';
     var topCourseCount = 0;
@@ -903,13 +903,13 @@
 
     var rowsHTML = '';
     paged.items.forEach(function(s) {
-      var grp = groups.find(function(g) { return g.id === s.groupId; });
+      var grpNames = groups.filter(function(g) { return s.groupIds && s.groupIds.includes(g.id); }).map(function(g) { return g.name; }).join(', ');
       var isDebtor = Number(s.balance) < 0;
       rowsHTML += '<tr>' +
         '<td><strong class="text-primary">' + escapeHTML(s.code) + '</strong></td>' +
         '<td><strong>' + escapeHTML(s.fullName) + '</strong></td>' +
         '<td>' + escapeHTML(s.phone) + '</td>' +
-        '<td>' + (grp ? '<span class="badge badge-info">' + escapeHTML(grp.name) + '</span>' : 'Guruhsiz') + '</td>' +
+        '<td>' + (grpNames || '-') + '</td>' +
         '<td class="' + (isDebtor ? 'text-danger font-bold' : 'text-success') + '">' + formatCurrency(s.balance) + '</td>' +
         '<td><span class="badge badge-' + (s.status === 'active' ? 'success' : 'warning') + '">' + escapeHTML(s.status) + '</span></td>' +
         '<td style="display:flex; gap:4px;">' +
@@ -936,9 +936,9 @@
       '</div>' +
       '<div class="table-responsive glass-card"><table class="data-table"><thead><tr><th>ID KOD</th><th>F.I.SH.</th><th>TELEFON</th><th>GURUH</th><th>BALANS</th><th>HOLAT</th><th>AMAL</th></tr></thead><tbody>' + rowsHTML + '</tbody></table>' + renderPaginationControls(paged) + '</div>' +
       // Add student modal
-      '<div class="modal-overlay" id="modal-student" style="display:none;"><div class="modal-content glass-card" style="padding:24px;"><h3>' + "Yangi O'quvchi Qo'shish" + '</h3><form id="form-student" class="mt-3"><div class="form-group"><label>F.I.SH.</label><input type="text" id="st-fullname" class="form-input" required placeholder="Sardorbek Rahimov"></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Telefon</label><input type="text" id="st-phone" class="form-input" required placeholder="+998 90 123-45-67"></div><div class="form-group"><label>Filial</label><select id="st-branch" class="form-select">' + branchOptions + '</select></div></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Ota-ona Ismi</label><input type="text" id="st-parent-name" class="form-input" placeholder="Otabek Rahimov"></div><div class="form-group"><label>Ota-ona Telefoni</label><input type="text" id="st-parent-phone" class="form-input" placeholder="+998 90 999-88-77"></div></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Guruh</label><select id="st-group" class="form-select">' + groupOptions + '</select></div><div class="form-group"><label>Telegram Chat ID (Xabarnomalar)</label><input type="text" id="st-tg-chat" class="form-input" placeholder="Masalan: 123456789"></div></div><div class="modal-footer" style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;"><button type="button" class="btn btn-secondary" data-action="close-modal" data-modal="modal-student">Bekor qilish</button><button type="submit" class="btn btn-primary">Saqlash</button></div></form></div></div>' +
+      '<div class="modal-overlay" id="modal-student" style="display:none;"><div class="modal-content glass-card" style="padding:24px;"><h3>' + "Yangi O'quvchi Qo'shish" + '</h3><form id="form-student" class="mt-3"><div class="form-group"><label>F.I.SH.</label><input type="text" id="st-fullname" class="form-input" required placeholder="Sardorbek Rahimov"></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Telefon</label><input type="text" id="st-phone" class="form-input" required placeholder="+998 90 123-45-67"></div><div class="form-group"><label>Filial</label><select id="st-branch" class="form-select">' + branchOptions + '</select></div></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Ota-ona Ismi</label><input type="text" id="st-parent-name" class="form-input" placeholder="Otabek Rahimov"></div><div class="form-group"><label>Ota-ona Telefoni</label><input type="text" id="st-parent-phone" class="form-input" placeholder="+998 90 999-88-77"></div></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Guruhlar (Ctrl bilan bir nechta tanlang)</label><select id="st-group" class="form-select" multiple style="height: 80px;">' + groupOptions + '</select><div id="st-conflict-warning" class="text-danger mt-1" style="display:none; font-size:12px; font-weight:bold;"></div></div><div class="form-group"><label>Telegram Chat ID (Xabarnomalar)</label><input type="text" id="st-tg-chat" class="form-input" placeholder="Masalan: 123456789"></div></div><div class="modal-footer" style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;"><button type="button" class="btn btn-secondary" data-action="close-modal" data-modal="modal-student">Bekor qilish</button><button type="submit" class="btn btn-primary">Saqlash</button></div></form></div></div>' +
       // Edit student modal (SEV-5-D: added parentName, parentPhone fields)
-      '<div class="modal-overlay" id="modal-student-edit" style="display:none;"><div class="modal-content glass-card" style="padding:24px;"><h3>O\'quvchini Tahrirlash</h3><form id="form-student-edit" class="mt-3"><input type="hidden" id="st-edit-id"><div class="form-group"><label>F.I.SH.</label><input type="text" id="st-edit-fullname" class="form-input" required></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Telefon</label><input type="text" id="st-edit-phone" class="form-input" required></div><div class="form-group"><label>Holat</label><select id="st-edit-status" class="form-select"><option value="active">Faol</option><option value="frozen">To\'xtatilgan</option><option value="graduated">Bitirgan</option></select></div></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Ota-ona Ismi</label><input type="text" id="st-edit-parent-name" class="form-input" placeholder="Ota-ona F.I.SH."></div><div class="form-group"><label>Ota-ona Telefoni</label><input type="text" id="st-edit-parent-phone" class="form-input" placeholder="+998 90 ..."></div></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Guruh</label><select id="st-edit-group" class="form-select">' + groupOptions + '</select></div><div class="form-group"><label>Telegram Chat ID (Xabarnomalar)</label><input type="text" id="st-edit-tg-chat" class="form-input" placeholder="Chat ID"></div></div><div class="modal-footer" style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;"><button type="button" class="btn btn-secondary" data-action="close-modal" data-modal="modal-student-edit">Bekor qilish</button><button type="submit" class="btn btn-primary">Saqlash</button></div></form></div></div>' +
+      '<div class="modal-overlay" id="modal-student-edit" style="display:none;"><div class="modal-content glass-card" style="padding:24px;"><h3>O\'quvchini Tahrirlash</h3><form id="form-student-edit" class="mt-3"><input type="hidden" id="st-edit-id"><div class="form-group"><label>F.I.SH.</label><input type="text" id="st-edit-fullname" class="form-input" required></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Telefon</label><input type="text" id="st-edit-phone" class="form-input" required></div><div class="form-group"><label>Holat</label><select id="st-edit-status" class="form-select"><option value="active">Faol</option><option value="frozen">To\'xtatilgan</option><option value="graduated">Bitirgan</option></select></div></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Ota-ona Ismi</label><input type="text" id="st-edit-parent-name" class="form-input" placeholder="Ota-ona F.I.SH."></div><div class="form-group"><label>Ota-ona Telefoni</label><input type="text" id="st-edit-parent-phone" class="form-input" placeholder="+998 90 ..."></div></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Guruhlar (Ctrl bilan bir nechta tanlang)</label><select id="st-edit-group" class="form-select" multiple style="height: 80px;">' + groupOptions + '</select><div id="st-edit-conflict-warning" class="text-danger mt-1" style="display:none; font-size:12px; font-weight:bold;"></div></div><div class="form-group"><label>Telegram Chat ID (Xabarnomalar)</label><input type="text" id="st-edit-tg-chat" class="form-input" placeholder="Chat ID"></div></div><div class="modal-footer" style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;"><button type="button" class="btn btn-secondary" data-action="close-modal" data-modal="modal-student-edit">Bekor qilish</button><button type="submit" class="btn btn-primary">Saqlash</button></div></form></div></div>' +
       // Balance adjust modal (FIX v2.4.0)
       '<div class="modal-overlay" id="modal-student-balance" style="display:none;"><div class="modal-content glass-card" style="padding:24px; max-width:360px;"><h3>💰 Balansni Sozlash</h3><form id="form-balance-adjust" class="mt-3"><input type="hidden" id="ba-student-id"><div class="form-group"><label>O\'quvchi</label><input type="text" id="ba-student-name" class="form-input" readonly></div><div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="form-group"><label>Amal turi</label><select id="ba-action-type" class="form-select"><option value="add">Kredit (Chegirma/Bonus)</option><option value="sub">Debet (Jarima/Qarz)</option></select></div><div class="form-group"><label>Summa (so\'m)</label><input type="number" id="ba-amount" class="form-input" required min="1000"></div></div><div class="form-group"><label>Tavsif / Sabab</label><input type="text" id="ba-desc" class="form-input" required placeholder="Masalan: Olimpiada chegirmasi"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-action="close-modal" data-modal="modal-student-balance">Bekor qilish</button><button type="submit" class="btn btn-success">Saqlash</button></div></form></div></div>';
 
@@ -949,6 +949,51 @@
       studentsPage = 1;
       renderStudents({ focusSearch: true });
     });
+
+    function checkScheduleConflict(groupIds) {
+      if (!groupIds || groupIds.length < 2) return null;
+      var allGroups = db.get('groups');
+      var selectedGroups = allGroups.filter(function(g) { return groupIds.includes(g.id); });
+      for (var i = 0; i < selectedGroups.length; i++) {
+        for (var j = i + 1; j < selectedGroups.length; j++) {
+          var g1 = selectedGroups[i];
+          var g2 = selectedGroups[j];
+          if (!g1.scheduleDays || !g2.scheduleDays) continue;
+          var days1 = g1.scheduleDays.split('-');
+          var days2 = g2.scheduleDays.split('-');
+          var commonDays = days1.filter(function(d) { return days2.includes(d); });
+          if (commonDays.length > 0 && g1.scheduleTime && g2.scheduleTime) {
+            var t1 = g1.scheduleTime.split(' - ');
+            var t2 = g2.scheduleTime.split(' - ');
+            if (t1.length === 2 && t2.length === 2) {
+              if (t1[0] < t2[1] && t2[0] < t1[1]) {
+                 return { g1: g1.name, g2: g2.name, days: commonDays.join(', ') };
+              }
+            }
+          }
+        }
+      }
+      return null;
+    }
+
+    function handleGroupSelectionChange(selectId, warningId) {
+      var select = document.getElementById(selectId);
+      var warning = document.getElementById(warningId);
+      if (!select || !warning) return;
+      select.addEventListener('change', function() {
+        var groupIds = Array.from(select.selectedOptions).map(function(opt) { return opt.value; });
+        var conflict = checkScheduleConflict(groupIds);
+        if (conflict) {
+          warning.innerText = 'Diqqat: ' + conflict.g1 + ' va ' + conflict.g2 + ' guruhlari dars vaqtlari ustma-ust tushadi (' + conflict.days + ')!';
+          warning.style.display = 'block';
+        } else {
+          warning.style.display = 'none';
+        }
+      });
+    }
+
+    handleGroupSelectionChange('st-group', 'st-conflict-warning');
+    handleGroupSelectionChange('st-edit-group', 'st-edit-conflict-warning');
 
     if (options.focusSearch) {
       setTimeout(function() {
@@ -979,7 +1024,12 @@
         document.getElementById('st-edit-fullname').value = s.fullName || '';
         document.getElementById('st-edit-phone').value = s.phone || '';
         document.getElementById('st-edit-status').value = s.status || 'active';
-        document.getElementById('st-edit-group').value = s.groupId || '';
+        var editSelect = document.getElementById('st-edit-group');
+        for (var i = 0; i < editSelect.options.length; i++) {
+          editSelect.options[i].selected = s.groupIds && s.groupIds.includes(editSelect.options[i].value);
+        }
+        var warningEl = document.getElementById('st-edit-conflict-warning');
+        if (warningEl) warningEl.style.display = 'none'; // reset warning on open
         document.getElementById('st-edit-tg-chat').value = s.telegramChatId || '';
         // SEV-5-D: Populate parent fields
         var pnEl = document.getElementById('st-edit-parent-name');
@@ -1029,7 +1079,8 @@
       var parentName = document.getElementById('st-parent-name').value.trim();
       var parentPhone = document.getElementById('st-parent-phone').value.trim();
       var branchId = document.getElementById('st-branch').value;
-      var groupId = document.getElementById('st-group').value;
+      var groupSelect = document.getElementById('st-group');
+      var groupIds = Array.from(groupSelect.selectedOptions).map(function(opt) { return opt.value; });
       var tgChatId = document.getElementById('st-tg-chat').value.trim();
       if (!fullName || !phone) return;
       // FIX: Phone number regex check
@@ -1039,7 +1090,7 @@
         return;
       }
       var code = generateCode('STUDENT', 'students');
-      db.insert('students', { id: genId('st'), code: code, fullName: fullName, phone: phone, parentName: parentName, parentPhone: parentPhone, branchId: branchId, groupId: groupId, status: 'active', balance: 0, telegramChatId: tgChatId, joinedDate: new Date().toISOString().split('T')[0] });
+      db.insert('students', { id: genId('st'), code: code, fullName: fullName, phone: phone, parentName: parentName, parentPhone: parentPhone, branchId: branchId, groupIds: groupIds, status: 'active', balance: 0, telegramChatId: tgChatId, joinedDate: new Date().toISOString().split('T')[0] });
       showToast("O'quvchi " + fullName + ' (' + code + ') saqlandi!', 'success');
       closeModal('modal-student');
       renderStudents();
@@ -1053,7 +1104,8 @@
       var fullName = document.getElementById('st-edit-fullname').value.trim();
       var phone = document.getElementById('st-edit-phone').value.trim();
       var status = document.getElementById('st-edit-status').value;
-      var groupId = document.getElementById('st-edit-group').value;
+      var editGroupSelect = document.getElementById('st-edit-group');
+      var groupIds = Array.from(editGroupSelect.selectedOptions).map(function(opt) { return opt.value; });
       var tgChatId = document.getElementById('st-edit-tg-chat').value.trim();
       // SEV-5-D FIX: Read parent fields from edit modal
       var parentNameEl = document.getElementById('st-edit-parent-name');
@@ -1066,7 +1118,7 @@
         showToast("Telefon formati noto'g'ri (Kamida 9 ta raqam)!", 'warning');
         return;
       }
-      db.update('students', id, { fullName: fullName, phone: phone, status: status, groupId: groupId, telegramChatId: tgChatId, parentName: parentName, parentPhone: parentPhone });
+      db.update('students', id, { fullName: fullName, phone: phone, status: status, groupIds: groupIds, telegramChatId: tgChatId, parentName: parentName, parentPhone: parentPhone });
       showToast("O'quvchi ma'lumotlari yangilandi!", 'success');
       closeModal('modal-student-edit');
       renderStudents();
@@ -1122,7 +1174,7 @@
     // SEV-4-D FIX: Pre-calculate student counts for groups in O(n) instead of O(n²)
     var studentsCountMap = {};
     db.get('students').forEach(function(s) {
-      if (s.groupId) studentsCountMap[s.groupId] = (studentsCountMap[s.groupId] || 0) + 1;
+      if (s.groupIds) s.groupIds.forEach(function(gid) { studentsCountMap[gid] = (studentsCountMap[gid] || 0) + 1; });
     });
 
     var teachers = db.get('users', function(u) { return u && u.role === 'teacher'; });
@@ -1196,7 +1248,7 @@
         var g = db.getById('groups', gid);
         if (!g) return;
         document.getElementById('as-group-id').value = gid;
-        var allStudents = db.get('students', function(s) { return s.groupId !== gid; });
+        var allStudents = db.get('students', function(s) { return !s.groupIds || !s.groupIds.includes(gid); });
         var opts = '<option value="">-- O\'quvchini tanlang --</option>';
         allStudents.forEach(function(s) { opts += '<option value="' + s.id + '">' + escapeHTML(s.fullName) + ' (' + escapeHTML(s.code) + ')</option>'; });
         document.getElementById('as-student-id').innerHTML = opts;
@@ -1225,8 +1277,11 @@
           var gid = btn.dataset.id;
           db.remove('groups', gid);
           // SEV-3-C FIX: Unassign students when their group is deleted
-          var studentsInGroup = db.get('students', function(s) { return s.groupId === gid; });
-          studentsInGroup.forEach(function(s) { db.update('students', s.id, { groupId: '' }); });
+          var studentsInGroup = db.get('students', function(s) { return s.groupIds && s.groupIds.includes(gid); });
+          studentsInGroup.forEach(function(s) { 
+            var newGroupIds = s.groupIds.filter(function(id) { return id !== gid; });
+            db.update('students', s.id, { groupIds: newGroupIds }); 
+          });
           showToast('Guruh o\'chirildi', 'warning');
           renderGroups();
         });
@@ -1347,7 +1402,7 @@
       } else {
         var tGroups = db.get('groups', function(g) { return g.teacherId === t.id; });
         tGroups.forEach(function(g) {
-          var groupStudentsCount = db.get('students', function(s) { return s.groupId === g.id && s.status === 'active'; }).length;
+          var groupStudentsCount = db.get('students', function(s) { return s.groupIds && s.groupIds.includes(g.id) && s.status === 'active'; }).length;
           estSalary += groupStudentsCount * Number(g.monthlyFee || 600000) * (sVal / 100);
         });
         salaryLabel = 'Taxminiy oylik (' + sVal + '%): ' + formatCurrency(estSalary);
@@ -1821,7 +1876,7 @@
     var students = db.get('students');
     var attendanceRecords = db.get('attendance');
     var currentGroup = groups.find(function(g) { return g.id === attGroupId; });
-    var groupStudents = students.filter(function(s) { return s.groupId === attGroupId; });
+    var groupStudents = students.filter(function(s) { return s.groupIds && s.groupIds.includes(attGroupId); });
 
     var container = document.getElementById('module-content');
     if (!container) return;
@@ -2102,8 +2157,9 @@
     if (pmStudentEl) pmStudentEl.addEventListener('change', function() {
       var st = students.find(function(s) { return s.id === pmStudentEl.value; });
       if (st) {
-        var grp = groups.find(function(g) { return g.id === st.groupId; });
-        document.getElementById('pm-amount').value = grp ? grp.monthlyFee : 600000;
+        var stGroups = groups.filter(function(g) { return st.groupIds && st.groupIds.includes(g.id); });
+        var totalFee = stGroups.reduce(function(sum, g) { return sum + Number(g.monthlyFee || 0); }, 0);
+        document.getElementById('pm-amount').value = totalFee || 600000;
       }
     });
 
@@ -2283,7 +2339,7 @@
     hwList.forEach(function(h) {
       var grp = groups.find(function(g) { return g.id === h.groupId; });
       // SEV-3-F FIX: Calculate totalCount dynamically to prevent stale data
-      var grpStudentsCount = db.get('students', function(s) { return s.groupId === h.groupId; }).length;
+      var grpStudentsCount = db.get('students', function(s) { return s.groupIds && s.groupIds.includes(h.groupId) && s.status === 'active'; }).length;
       var totalCount = grpStudentsCount || h.totalCount;
       rowsHTML += '<tr><td><strong>' + escapeHTML(h.title) + '</strong></td><td>' + (grp ? escapeHTML(grp.name) : '-') + '</td><td>' + escapeHTML(h.dueDate) + '</td><td><span class="badge badge-success">' + h.submittedCount + ' / ' + totalCount + ' nafar</span></td><td><strong>' + escapeHTML(h.avgGrade) + '</strong></td></tr>';
     });
@@ -2305,7 +2361,7 @@
     if (form) form.addEventListener('submit', function(e) {
       e.preventDefault();
       var gId = document.getElementById('hw-group').value;
-      var studCount = db.get('students', function(s) { return s.groupId === gId; }).length;
+      var studCount = db.get('students', function(s) { return s.groupIds && s.groupIds.includes(gId) && s.status === 'active'; }).length;
       db.insert('homework', { id: crypto.randomUUID(), groupId: gId, title: document.getElementById('hw-title').value.trim(), dueDate: document.getElementById('hw-due').value, submittedCount: 0, totalCount: studCount || 15, avgGrade: 'Baholanmagan', status: 'pending' });
       showToast('Yangi uy vazifasi yaratildi!', 'success');
       closeModal('modal-hw');
@@ -2612,8 +2668,8 @@
     // Top kurslar hisoblash
     var courseCounts = {};
     students.forEach(function(s) {
-      var grp = groups.find(function(g) { return g.id === s.groupId; });
-      if (grp) { courseCounts[grp.courseName] = (courseCounts[grp.courseName] || 0) + 1; }
+      var stGroups = groups.filter(function(g) { return s.groupIds && s.groupIds.includes(g.id); });
+      stGroups.forEach(function(grp) { courseCounts[grp.courseName] = (courseCounts[grp.courseName] || 0) + 1; });
     });
     var topCourse = Object.keys(courseCounts).sort(function(a, b) { return courseCounts[b] - courseCounts[a]; })[0];
 
