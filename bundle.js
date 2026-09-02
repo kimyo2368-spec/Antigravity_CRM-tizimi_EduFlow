@@ -2865,7 +2865,8 @@
 
     // WhatsApp ommaviy xabar uchun o'quvchilar
     var studentCheckboxes = students.map(function(s) {
-      return '<label style="display:flex; align-items:center; gap:8px; padding:6px 0; cursor:pointer;"><input type="checkbox" class="wa-student-check" data-phone="' + escapeHTML(s.phone) + '" data-name="' + escapeHTML(s.fullName) + '"> <strong>' + escapeHTML(s.fullName) + '</strong> <small class="text-muted">' + escapeHTML(s.phone) + '</small></label>';
+      var botBadge = s.telegramChatId ? '<i class="fa-brands fa-telegram text-primary" title="Botga ulangan"></i>' : '';
+      return '<label style="display:flex; align-items:center; gap:8px; padding:6px 0; cursor:pointer;"><input type="checkbox" class="wa-student-check" data-phone="' + escapeHTML(s.phone) + '" data-name="' + escapeHTML(s.fullName) + '" data-chatid="' + escapeHTML(s.telegramChatId || '') + '"> <strong>' + escapeHTML(s.fullName) + '</strong> <small class="text-muted">' + escapeHTML(s.phone) + '</small> ' + botBadge + '</label>';
     }).join('');
 
     container.innerHTML =
@@ -2894,9 +2895,10 @@
         '<div style="display:flex; gap:8px; margin:12px 0;"><button class="btn btn-secondary btn-sm" data-action="wa-select-all">Hammasini Tanlash</button><button class="btn btn-secondary btn-sm" data-action="wa-select-none">Tanlovni Olib Tashlash</button></div>' +
         '<div id="wa-student-list" style="max-height:200px; overflow-y:auto; padding:8px; background:var(--bg-input); border-radius:8px; margin-bottom:12px;">' + studentCheckboxes + '</div>' +
         '<div class="form-group"><label>Xabar matni</label><textarea id="wa-message" class="form-input" rows="3" placeholder="Assalomu alaykum! EduFlow markazidan eslatma..." style="resize:vertical;"></textarea></div>' +
-        '<div style="display:flex; gap:12px; margin-top:16px;">' +
+        '<div style="display:flex; gap:12px; margin-top:16px; flex-wrap:wrap;">' +
           '<button class="btn btn-success" data-action="send-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>' +
-          '<button class="btn btn-primary" data-action="send-tg-phone"><i class="fa-brands fa-telegram"></i> Telegram</button>' +
+          '<button class="btn btn-primary" data-action="send-tg-phone"><i class="fa-brands fa-telegram"></i> Telegram (Tel)</button>' +
+          '<button class="btn btn-info" data-action="send-tg-bot" style="color:white;"><i class="fa-solid fa-robot"></i> Telegram (Bot)</button>' +
         '</div>' +
       '</div>';
 
@@ -2998,6 +3000,41 @@
           }).join('');
           showModal('Telegram Xabarlar', '<p class="text-muted mb-3">Quyidagi o\'quvchilarga Telegram yuborish uchun ustiga bosing:</p><div style="display:flex; flex-wrap:wrap;">' + linksHtml + '</div>');
         }
+      },
+      'send-tg-bot': function() {
+        var message = (document.getElementById('wa-message') || {}).value || '';
+        if (!message.trim()) { showToast('Xabar matni kiriting!', 'warning'); return; }
+        
+        var settings = db.getSettings();
+        if (!settings.telegramBotToken) { showToast('Bot token kiritilmagan!', 'error'); return; }
+
+        var selected = [];
+        var noChatIdCount = 0;
+        document.querySelectorAll('.wa-student-check:checked').forEach(function(c) { 
+          if (c.dataset.chatid) {
+            selected.push({ chatId: c.dataset.chatid, name: c.dataset.name }); 
+          } else {
+            noChatIdCount++;
+          }
+        });
+        
+        if (selected.length === 0) { 
+          showToast('Tanlangan o\'quvchilarda Telegram bot ulanmagan!', 'warning'); 
+          return; 
+        }
+
+        selected.forEach(function(s, index) {
+          setTimeout(function() {
+            sendTelegramNotification(s.chatId, message);
+          }, index * 300);
+        });
+
+        var toastMsg = selected.length + ' ta o\'quvchiga xabar yuborilmoqda!';
+        if (noChatIdCount > 0) {
+          toastMsg += ' (' + noChatIdCount + ' tasida bot ulanmagan)';
+        }
+        showToast(toastMsg, 'success');
+        document.getElementById('wa-message').value = '';
       }
     });
   }
