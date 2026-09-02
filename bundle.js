@@ -1888,10 +1888,10 @@
     groupStudents.forEach(function(s) {
       var rec = attendanceRecords.find(function(a) { return a.groupId === attGroupId && a.studentId === s.id && a.date === attDate; });
       var status = rec ? rec.status : '';
-      rowsHTML += '<tr><td><strong>' + escapeHTML(s.code) + '</strong></td><td><strong>' + escapeHTML(s.fullName) + '</strong></td><td><div style="display:flex; gap:6px;">' +
-        '<button class="btn ' + (status === 'present' ? 'btn-success' : 'btn-secondary') + ' btn-xs" data-action="mark-att" data-student="' + s.id + '" data-status="present">Keldi</button>' +
-        '<button class="btn ' + (status === 'absent' ? 'btn-danger' : 'btn-secondary') + ' btn-xs" data-action="mark-att" data-student="' + s.id + '" data-status="absent">Kelmadi</button>' +
-        '<button class="btn ' + (status === 'excused' ? 'btn-warning' : 'btn-secondary') + ' btn-xs" data-action="mark-att" data-student="' + s.id + '" data-status="excused">Sababli</button>' +
+      rowsHTML += '<tr><td><strong>' + escapeHTML(s.code) + '</strong></td><td><strong>' + escapeHTML(s.fullName) + '</strong></td><td><div style="display:flex; gap:6px; flex-wrap:wrap; min-width:160px;">' +
+        '<button class="btn ' + (status === 'present' ? 'btn-success' : 'btn-secondary') + ' btn-sm" style="flex:1; min-width:65px; padding:8px 4px; justify-content:center;" data-action="mark-att" data-student="' + s.id + '" data-status="present">Keldi</button>' +
+        '<button class="btn ' + (status === 'absent' ? 'btn-danger' : 'btn-secondary') + ' btn-sm" style="flex:1; min-width:65px; padding:8px 4px; justify-content:center;" data-action="mark-att" data-student="' + s.id + '" data-status="absent">Kelmadi</button>' +
+        '<button class="btn ' + (status === 'excused' ? 'btn-warning' : 'btn-secondary') + ' btn-sm" style="flex:1; min-width:65px; padding:8px 4px; justify-content:center;" data-action="mark-att" data-student="' + s.id + '" data-status="excused">Sababli</button>' +
       '</div></td></tr>';
     });
 
