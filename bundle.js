@@ -2889,12 +2889,15 @@
         '<button class="btn btn-success" data-action="do-backup"><i class="fa-solid fa-download"></i> Zaxiralash (JSON)</button>' +
         '<label class="btn btn-warning" style="cursor:pointer;"><i class="fa-solid fa-upload"></i> Tiklash (JSON) <input type="file" id="restore-file" accept=".json" style="display:none;"></label>' +
       '</div><p class="text-muted mt-2" style="font-size:12px;">⚠️ Tiklash amali mavjud ma\'lumotlarni almashtiradi!</p></div>' +
-      // WhatsApp ommaviy xabar
-      '<div class="glass-card"><h3><i class="fa-brands fa-whatsapp text-success"></i> WhatsApp Ommaviy Xabar</h3><p class="text-muted mt-2">O\'quvchilarni tanlang va xabar yuboring:</p>' +
+      // WhatsApp va Telegram ommaviy xabar
+      '<div class="glass-card"><h3><i class="fa-solid fa-paper-plane text-primary"></i> WhatsApp & Telegram Xabar</h3><p class="text-muted mt-2">O\'quvchilarni tanlang va xabar yuboring:</p>' +
         '<div style="display:flex; gap:8px; margin:12px 0;"><button class="btn btn-secondary btn-sm" data-action="wa-select-all">Hammasini Tanlash</button><button class="btn btn-secondary btn-sm" data-action="wa-select-none">Tanlovni Olib Tashlash</button></div>' +
         '<div id="wa-student-list" style="max-height:200px; overflow-y:auto; padding:8px; background:var(--bg-input); border-radius:8px; margin-bottom:12px;">' + studentCheckboxes + '</div>' +
         '<div class="form-group"><label>Xabar matni</label><textarea id="wa-message" class="form-input" rows="3" placeholder="Assalomu alaykum! EduFlow markazidan eslatma..." style="resize:vertical;"></textarea></div>' +
-        '<button class="btn btn-success" data-action="send-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp orqali Yuborish</button>' +
+        '<div style="display:flex; gap:12px; margin-top:16px;">' +
+          '<button class="btn btn-success" data-action="send-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>' +
+          '<button class="btn btn-primary" data-action="send-tg-phone"><i class="fa-brands fa-telegram"></i> Telegram</button>' +
+        '</div>' +
       '</div>';
 
     // Sozlamalar saqlansin
@@ -2963,7 +2966,6 @@
         document.querySelectorAll('.wa-student-check:checked').forEach(function(c) { selected.push({ phone: c.dataset.phone, name: c.dataset.name }); });
         if (selected.length === 0) { showToast('Kamida 1 ta o\'quvchi tanlang!', 'warning'); return; }
 
-        // FIX #11: Browsers block multiple window.open calls. Show clickable link list instead.
         if (selected.length === 1) {
           var cleanPhone = (selected[0].phone || '').replace(/[^0-9+]/g, '');
           window.open('https://wa.me/' + cleanPhone + '?text=' + encodeURIComponent(message), '_blank');
@@ -2974,12 +2976,27 @@
             return '<a href="https://wa.me/' + cp + '?text=' + encodeURIComponent(message) + '" target="_blank" class="btn btn-success btn-sm" style="margin:4px;">' +
               '<i class="fa-brands fa-whatsapp"></i> ' + escapeHTML(s.name) + '</a>';
           }).join('');
-          showConfirm(selected.length + ' ta o\'quvchiga WhatsApp yuboring — quyidagi tugmalarni bosing (Brauzer ko\'p oynani bloklaydi):', function() {});
-          // Show a temporary toast with count
-          showToast(selected.length + ' ta link tayyorlandi. Har birini alohida bosib oching.', 'info');
-          // Open first immediately, rest show as toast
-          var firstPhone = (selected[0].phone || '').replace(/[^0-9+]/g, '');
-          window.open('https://wa.me/' + firstPhone + '?text=' + encodeURIComponent(message), '_blank');
+          showModal('WhatsApp Xabarlar', '<p class="text-muted mb-3">Quyidagi o\'quvchilarga WhatsApp yuborish uchun ustiga bosing:</p><div style="display:flex; flex-wrap:wrap;">' + linksHtml + '</div>');
+        }
+      },
+      'send-tg-phone': function() {
+        var message = (document.getElementById('wa-message') || {}).value || '';
+        if (!message.trim()) { showToast('Xabar matni kiriting!', 'warning'); return; }
+        var selected = [];
+        document.querySelectorAll('.wa-student-check:checked').forEach(function(c) { selected.push({ phone: c.dataset.phone, name: c.dataset.name }); });
+        if (selected.length === 0) { showToast('Kamida 1 ta o\'quvchi tanlang!', 'warning'); return; }
+
+        if (selected.length === 1) {
+          var cleanPhone = (selected[0].phone || '').replace(/[^0-9]/g, '');
+          window.open('https://t.me/+' + cleanPhone + '?text=' + encodeURIComponent(message), '_blank');
+          showToast('Telegram ochildi!', 'success');
+        } else {
+          var linksHtml = selected.map(function(s) {
+            var cp = (s.phone || '').replace(/[^0-9]/g, '');
+            return '<a href="https://t.me/+' + cp + '?text=' + encodeURIComponent(message) + '" target="_blank" class="btn btn-primary btn-sm" style="margin:4px;">' +
+              '<i class="fa-brands fa-telegram"></i> ' + escapeHTML(s.name) + '</a>';
+          }).join('');
+          showModal('Telegram Xabarlar', '<p class="text-muted mb-3">Quyidagi o\'quvchilarga Telegram yuborish uchun ustiga bosing:</p><div style="display:flex; flex-wrap:wrap;">' + linksHtml + '</div>');
         }
       }
     });
