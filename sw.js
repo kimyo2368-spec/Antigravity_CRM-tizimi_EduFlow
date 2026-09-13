@@ -1,8 +1,8 @@
-const CACHE_NAME = 'eduflow-cache-v2';
+const CACHE_NAME = 'eduflow-cache-v3';
 const ASSETS = [
   'index.html',
   'styles.css',
-  'bundle.js',
+  'app.js',
   'manifest.json'
 ];
 
