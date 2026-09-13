@@ -1,5 +1,6 @@
 import { genId, hashPassword, showToast } from '../utils/helpers.js';
 import { FIREBASE_CONFIG } from '../config.js';
+import { DEFAULT_SETTINGS } from '../types/index.js';
 
   var STORAGE_KEY = 'eduflow_crm_db';
   // FIX #2: No plain password field — only passwordHash
