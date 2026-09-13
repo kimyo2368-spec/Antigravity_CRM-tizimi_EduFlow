@@ -1,5 +1,6 @@
-// Supabase Configuration
-// Iltimos, bu yerga o'zingizning Supabase loyiha sozlamalaringizni kiriting
+// Firebase Configuration
+// DIQQAT: Frontend orqali Firebase ishlatilganda kalitlar (API keys) ochiq qoladi.
+// Ma'lumotlarni xavfsiz saqlash uchun "Firebase Security Rules" (Qoidalar) orqali himoyalash shart!
 export const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDmKNvBDeaRhC5zOjlnbfR4PswayNw84ZI",
   authDomain: "o-quv-markaz-eduflow.firebaseapp.com",
