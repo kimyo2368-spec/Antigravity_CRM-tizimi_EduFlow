@@ -255,8 +255,6 @@ import { ROLE_LABELS } from '../types/index.js';
       }
     });
   }
-  // ---------- 2. STUDENTS (Edit+Search added) ----------
-  var studentsPage = 1;
-  var studentsSearch = '';
+
 
 export { renderDashboard };

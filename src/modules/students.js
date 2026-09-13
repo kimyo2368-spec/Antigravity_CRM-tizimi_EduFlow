@@ -3,6 +3,9 @@ import { auth } from '../services/auth.js';
 import { closeModal, delegateClicks, escapeHTML, formatCurrency, genId, generateCode, openModal, paginate, renderPaginationControls, showConfirm, showToast } from '../utils/helpers.js';
 import { ROLE_LABELS } from '../types/index.js';
 
+  var studentsPage = 1;
+  var studentsSearch = '';
+
   function renderStudents(options) {
     options = options || {};
     var ab = auth.getActiveBranch();

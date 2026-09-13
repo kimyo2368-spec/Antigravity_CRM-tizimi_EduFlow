@@ -3,6 +3,10 @@ import { auth } from '../services/auth.js';
 import { closeModal, delegateClicks, escapeHTML, formatCurrency, genId, generateCode, openModal, paginate, renderPaginationControls, sendTelegramNotification, showConfirm, showToast } from '../utils/helpers.js';
 import { ROLE_LABELS } from '../types/index.js';
 
+  var paymentsPage = 1;
+  var paymentsSearch = '';
+  var paymentsFilterMethod = 'all';
+
   function renderPayments(options) {
     options = options || {};
     var ab = auth.getActiveBranch();
@@ -54,6 +58,7 @@ import { ROLE_LABELS } from '../types/index.js';
     // FIX: Filter listeners
     var pmSearchEl = document.getElementById('pm-search');
     var pmMethodEl = document.getElementById('pm-filter-method');
+    var pmStudentEl = document.getElementById('pm-student');
     if (pmSearchEl) pmSearchEl.addEventListener('input', function() { paymentsSearch = pmSearchEl.value.trim(); paymentsPage = 1; renderPayments(); });
     if (pmMethodEl) pmMethodEl.addEventListener('change', function() { paymentsFilterMethod = pmMethodEl.value; paymentsPage = 1; renderPayments(); });
     function updateAmount() {
