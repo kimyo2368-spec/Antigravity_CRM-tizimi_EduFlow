@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="uz" data-theme="dark">
-<head><script>window.onerror = function(msg) { console.error("Xato: " + msg); };</script>
+<head><script>window.onerror = function(msg, url, line) { alert("Xato yuz berdi: " + msg + "\nQator: " + line); console.error("Xato: " + msg); }; window.addEventListener('unhandledrejection', function(event) { alert("Modul xatosi: " + event.reason); });</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="EduFlow CRM v1.8.0 — O'quv markazlarini raqamlashtirish, o'quvchilar, moliya, davomat va AI boshqaruv tizimi.">
