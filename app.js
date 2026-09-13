@@ -411,7 +411,7 @@ import { renderSettings } from './src/modules/settings.js';
       }
     }, 80);
   };
-  document.addEventListener('DOMContentLoaded', function() {
+  function bootstrapApp() {
     window.eduFlowApp = new EduFlowApp();
     window.eduFlowApp.init();
     // Register PWA Service Worker (v2.4.0) with custom update prompt
@@ -441,7 +441,12 @@ import { renderSettings } from './src/modules/settings.js';
         }
       });
     }
-  });
+  }
 
-window.eduFlowApp = new EduFlowApp();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrapApp);
+  } else {
+    bootstrapApp();
+  }
+
 export default EduFlowApp;
