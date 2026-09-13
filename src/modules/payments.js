@@ -2,7 +2,6 @@ import { db } from '../services/db.js';
 import { auth } from '../services/auth.js';
 import { closeModal, delegateClicks, escapeHTML, formatCurrency, genId, generateCode, openModal, paginate, renderPaginationControls, sendTelegramNotification, showConfirm, showToast } from '../utils/helpers.js';
 import { ROLE_LABELS } from '../types/index.js';
-import { renderPaginationControls } from '../utils/shared_render.js';
 
   function renderPayments(options) {
     options = options || {};
