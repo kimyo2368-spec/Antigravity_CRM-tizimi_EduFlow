@@ -104,16 +104,7 @@ import { ROLE_LABELS, ROLE_PERMISSIONS } from '../types/index.js';
     return allowed.indexOf(route) !== -1;
   };
   var auth = new AuthModule();
-  // FIX: openModal — birinchi input ga auto-fokus
-  var _origOpenModal = openModal;
-  openModal = function(id) {
-    _origOpenModal(id);
-    var el = document.getElementById(id);
-    if (el) {
-      var first = el.querySelector('input:not([type=hidden]), select, textarea');
-      if (first) setTimeout(function() { first.focus(); }, 100);
-    }
-  };
+
   // ==========================================
 
 export { auth, SESSION_KEY, BRUTE_KEY };

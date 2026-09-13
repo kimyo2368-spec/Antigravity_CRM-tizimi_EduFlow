@@ -180,7 +180,11 @@ function escapeHTML(str) {
   // ==========================================
   function openModal(id) {
     var el = document.getElementById(id);
-    if (el) el.style.display = 'flex';
+    if (el) {
+      el.style.display = 'flex';
+      var first = el.querySelector('input:not([type=hidden]), select, textarea');
+      if (first) setTimeout(function() { first.focus(); }, 100);
+    }
   }
   function closeModal(id) {
     var el = document.getElementById(id);
