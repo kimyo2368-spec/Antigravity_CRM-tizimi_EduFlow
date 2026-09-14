@@ -104,9 +104,5 @@ import { ROLE_LABELS } from '../types/index.js';
       inp.addEventListener('change', function() { updateEmpAttendance(this.dataset.empid, 'timeOut', this.value); });
     });
   }
-  // ---------- 6. PAYMENTS (Filter + Search added v1.9.0) ----------
-  var paymentsPage = 1;
-  var paymentsFilterMethod = 'all';
-  var paymentsSearch = '';
 
 export { renderEmployeeAttendance };

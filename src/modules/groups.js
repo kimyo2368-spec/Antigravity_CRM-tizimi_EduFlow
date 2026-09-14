@@ -192,7 +192,14 @@ import { ROLE_LABELS } from '../types/index.js';
       var gid = document.getElementById('as-group-id').value;
       var sid = document.getElementById('as-student-id').value;
       if (!sid) { showToast("O'quvchini tanlang!", 'warning'); return; }
-      db.update('students', sid, { groupId: gid });
+      var st = db.getById('students', sid);
+      if (st) {
+        var gids = st.groupIds || [];
+        if (!gids.includes(gid)) {
+          gids.push(gid);
+          db.update('students', sid, { groupIds: gids });
+        }
+      }
       showToast("O'quvchi guruhga biriktirildi!", 'success');
       closeModal('modal-assign-student');
       renderGroups();

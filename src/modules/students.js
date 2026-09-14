@@ -277,7 +277,12 @@ import { ROLE_LABELS } from '../types/index.js';
           // SEV-2-C FIX: To'lov yozuvlarini ham tozalash (orphan payments)
           var pmList = db.get('payments', function(p) { return p.studentId === sid; });
           pmList.forEach(function(p) { db.remove('payments', p.id); });
-          showToast(sname + " o'chirildi (" + attCount + ' davomat, ' + pmCount + " to'lov yozuvi ham tozalandi)", 'warning');
+          // O'quvchiga tegishli shartnomalarni ham tozalash
+          var ctList = db.get('contracts', function(c) { return c.studentId === sid; });
+          var ctCount = ctList.length;
+          ctList.forEach(function(c) { db.remove('contracts', c.id); });
+          
+          showToast(sname + " o'chirildi (" + attCount + ' davomat, ' + pmCount + " to'lov va " + ctCount + " ta shartnoma ham tozalandi)", 'warning');
           renderStudents();
         });
       },
