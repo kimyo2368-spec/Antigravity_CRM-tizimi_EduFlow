@@ -25,6 +25,9 @@
     workHours: '08:00 - 20:00',
     rentExpense: 3500000,
     marketingExpense: 1500000,
+    telegramBotToken: '',
+    telegramDefaultChatId: '',
+    aiApiKey: '',
     attendanceSmsEnabled: true,
     autoBackupDaily: true
   };

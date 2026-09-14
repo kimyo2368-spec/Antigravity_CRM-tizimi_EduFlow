@@ -27,6 +27,7 @@ import { ROLE_LABELS } from '../types/index.js';
           '<div class="form-group"><label>Telegram Bot Token (Xavfsiz/Maxfiy)</label><input type="password" id="set-tg-token" class="form-input" value="' + escapeHTML(settings.telegramBotToken || '') + '" placeholder="BotToken (BotFather dan)"></div>' +
           '<div class="form-group"><label>Telegram Default Chat ID (Kanal/Guruh)</label><input type="text" id="set-tg-chat" class="form-input" value="' + escapeHTML(settings.telegramDefaultChatId || '') + '" placeholder="Masalan: -10012345678"></div>' +
         '</div>' +
+        '<div class="form-group"><label><i class="fa-solid fa-brain text-purple"></i> Sun\'iy Intellekt API Key (OpenAI / Gemini)</label><input type="password" id="set-ai-apikey" class="form-input" value="' + escapeHTML(settings.aiApiKey || '') + '" placeholder="sk-..."></div>' +
         '<button type="submit" class="btn btn-primary">Sozlamalarni Saqlash</button>' +
       '</form></div>' +
       // Backup / Restore
@@ -55,7 +56,8 @@ import { ROLE_LABELS } from '../types/index.js';
         rentExpense: Number(document.getElementById('set-rent').value),
         marketingExpense: Number(document.getElementById('set-marketing').value),
         telegramBotToken: document.getElementById('set-tg-token').value.trim(),
-        telegramDefaultChatId: document.getElementById('set-tg-chat').value.trim()
+        telegramDefaultChatId: document.getElementById('set-tg-chat').value.trim(),
+        aiApiKey: document.getElementById('set-ai-apikey').value.trim()
       });
       var logoEl = document.getElementById('header-logo-title');
       if (logoEl) logoEl.innerText = document.getElementById('set-logo').value;
